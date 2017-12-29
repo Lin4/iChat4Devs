@@ -9,27 +9,42 @@
 import UIKit
 
 class LoginVC: UIViewController {
-
+    @IBOutlet weak var emailTextField: CustomTextField!
+    @IBOutlet weak var passwordTxtField: CustomTextField!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+        emailTextField.delegate = self
+        passwordTxtField.delegate = self
     }
     
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+    @IBAction func signInBtnTapped(_ sender: Any) {
+        if emailTextField != nil && passwordTxtField != nil {
+            AuthService.instance.loginUser(withEmail: emailTextField.text!, andPassword: passwordTxtField.text!, loginComplete: {(success, loginError) in
+                if success {
+                    self.dismiss(animated: true, completion: nil)
+                } else {
+                    print(String(describing: loginError?.localizedDescription))
+                }
+                AuthService.instance.registerUser(withEmail: self.emailTextField.text!, andPassword: self.passwordTxtField.text!, userCreationComplete: {(success, registerError) in
+                    if success {
+                        AuthService.instance.loginUser(withEmail: self.emailTextField.text!, andPassword: self.passwordTxtField.text!, loginComplete: {(success,nil) in
+                            self.dismiss(animated: true, completion: nil)
+                            print("Successfuly Registered User")
+                        })
+                    } else {
+                        print(String(describing: registerError?.localizedDescription))
+                    }
+                })
+            })
+        }
     }
-    */
+    
+    @IBAction func closeBtnTapped(_ sender: Any) {
+        dismiss(animated: true, completion: nil)
+    }
+}
 
+extension LoginVC: UITextFieldDelegate {
+    
 }
